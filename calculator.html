@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unusual Calculator</title>
+  <link rel="icon" href="guitar.ico">
+  <style>
+     body {
+      background: linear-gradient( #006f94, #032452);
+      background-repeat: no-repeat;
+      background-color: #032452;
+      font-family: "Courier New", monospace;
+      font-size: 20px;
+      color: #ffffff;
+    }
+
+    header {
+      text-align: left;
+      padding: 20px;
+    }
+
+    form {
+      text-align: left;
+      margin-top: 20px;
+    }
+    
+    select, button {
+      margin: 15px;
+      padding: 7px;
+    }
+    
+    input[type="text"] {
+      margin: 15px;
+      padding: 10px;
+      width: 200px;
+    }
+
+    input[type="color"] {
+      width: 60px;
+      height: 30px;
+      padding: 0;
+    }
+
+    #picture {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      height: 250px;
+      transform: rotate(180deg);
+    }
+
+    #arguments, #result {
+      display: flex;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><i>Unusual Calculator</i></h1>
+  </header>
+
+  <div>
+    <form id="calculatorForm">
+      <input type="text" id="arguments" placeholder="arguments" style="font-style:italic"/>
+      <input type="text" id="result" readonly placeholder="result" style="font-style:italic"/>
+      <select id="operation">
+        <option value="sum">∑</option>
+        <option value="product">∏</option>
+        <option value="maximum">></option>
+        <option value="minimum"><</option>
+      </select>
+      <button type="button" id="launchButton">Count</button>
+      <button type="button" id="randomButton">Fill</button>
+      <button type="button" id="saveButton">Save</button>
+    </form>
+  </div>
+
+  <hr />
+
+  <div>
+    <label for="foreground">Foreground Color:</label>
+    <input type="color" id="foreground" />
+    <label for="background">Background Color:</label>
+    <input type="color" id="background" />
+  </div>
+
+  <img src="calc.png" id="picture" alt="Picture" />
+
+  <script>
+    
+    function calculateResult() {
+      const argumentsField = document.getElementById('arguments');
+      const operationSelect = document.getElementById('operation');
+      const resultField = document.getElementById('result');
+
+      const argumentsString = argumentsField.value;
+      const operation = operationSelect.value;
+      const argumentsArray = argumentsString.split(' ').map(Number);
+
+      let result;
+
+      switch (operation) {
+        case 'sum':
+          result = argumentsArray.reduce((acc, val) => acc + val, 0);
+          break;
+        case 'product':
+          result = argumentsArray.reduce((acc, val) => acc * val, 1);
+          break;
+        case 'maximum':
+          result = Math.max(...argumentsArray);
+          break;
+        case 'minimum':
+          result = Math.min(...argumentsArray);
+          break;
+        default:
+          result = 'Invalid operation';
+          break;
+      }
+
+      resultField.value = result;
+    }
+
+    function generateRandomIntegers() {
+      const randomArguments = Array.from({ length: 10 }, () => Math.floor(Math.random() * 10));
+      document.getElementById('arguments').value = randomArguments.join(' ');
+    }
+
+    function saveDataToFile() {
+      const argumentsField = document.getElementById('arguments');
+      const operationSelect = document.getElementById('operation');
+      const resultField = document.getElementById('result');
+
+      const argumentsString = argumentsField.value;
+      const operation = operationSelect.value;
+      const result = resultField.value;
+
+      const data = `Operation: ${operation}\nArguments: ${argumentsString}\nResult: ${result}`;
+      const filename = prompt("Enter the filename to save the data:");
+      if (filename) {
+        const blob = new Blob([data], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${filename}.txt`;
+        link.click();
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    document.getElementById('launchButton').addEventListener('click', calculateResult);
+    document.getElementById('randomButton').addEventListener('click', generateRandomIntegers);
+    document.getElementById('saveButton').addEventListener('click', saveDataToFile);
+
+    document.getElementById('foreground').addEventListener('input', function() {
+      const foregroundColor = this.value;
+      console.log('foregraund',foregroundColor);
+      document.getElementById('arguments').style.color = foregroundColor;
+      document.getElementById('result').style.color = foregroundColor;
+    });
+
+    document.getElementById('background').addEventListener('input', function() {
+      const backgroundColor = this.value;
+      console.log("backgroud",backgroundColor);
+      document.getElementById('arguments').style.backgroundColor = backgroundColor;
+      document.getElementById('result').style.backgroundColor = backgroundColor;
+    });
+
+  </script>
+</body>
+</html>
